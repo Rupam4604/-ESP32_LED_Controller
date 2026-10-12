@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#10131c">
+<title>Glow Controller V2.1</title>
+<style>
+:root{color-scheme:dark;--bg:#10131c;--panel:#1a1f2c;--panel2:#22293a;--text:#f4f6ff;--muted:#aab2c5;--accent:#8b7cff;--good:#5ce0a1;--bad:#ff7d8b;--line:#343c50}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#252044 0,#10131c 50%);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--text);min-height:100vh}
+main{width:min(720px,100%);margin:auto;padding:24px 16px 40px}.head{display:flex;align-items:center;gap:14px;margin-bottom:22px}.logo{width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#8b7cff,#48d8c6);display:grid;place-items:center;font-size:26px;color:#10131c;font-weight:900}.eyebrow{font-size:12px;letter-spacing:.14em;color:#b9b1ff;font-weight:800}.head h1{margin:2px 0 0;font-size:clamp(24px,6vw,32px);letter-spacing:-.04em}.sub{color:var(--muted);margin:3px 0 0;font-size:14px}.statusbar{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);padding:14px 16px;border-radius:16px;margin-bottom:16px}.status{display:flex;align-items:center;gap:9px;font-weight:700}.dot{width:10px;height:10px;border-radius:50%;background:var(--bad);box-shadow:0 0 0 4px #ff7d8b20}.dot.on{background:var(--good);box-shadow:0 0 0 4px #5ce0a120}.small{font-size:12px;color:var(--muted)}button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:12px 15px;font-weight:750;transition:transform .12s,filter .12s}button:active{transform:scale(.98)}button:disabled{opacity:.45;cursor:not-allowed}.primary{background:var(--accent);color:white}.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}.danger{background:#482832;color:#ffdce1;border:1px solid #73414c}.card{background:linear-gradient(145deg,#1b202e,#171b26);border:1px solid var(--line);border-radius:20px;padding:18px;margin:14px 0}.card h2{font-size:17px;margin:0 0 14px}.labelrow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}.value{font-variant-numeric:tabular-nums;color:#c7c0ff;font-weight:800}.colorrow{display:grid;grid-template-columns:86px 1fr;gap:14px;align-items:center}.colorinput{width:86px;height:64px;border:0;padding:0;background:none;border-radius:12px;overflow:hidden;cursor:pointer}.hexbox{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px}.hexbox label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}.hexbox input{background:transparent;border:0;color:var(--text);font:700 16px ui-monospace,monospace;width:100%;outline:none;text-transform:uppercase}input[type=range]{width:100%;accent-color:var(--accent);height:28px}.rangeends{display:flex;justify-content:space-between;color:var(--muted);font-size:12px}.effects{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.effect{background:var(--panel2);border:1px solid var(--line);color:var(--text);min-height:54px}.effect.active{background:#38315e;border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}.effect.off{color:#ffb8c0}.log{min-height:20px;color:var(--muted);font-size:13px;overflow-wrap:anywhere}.foot{text-align:center;color:var(--muted);font-size:12px;margin-top:18px}.notice{background:#302a1d;border:1px solid #5d4d2a;color:#f5e3b4;padding:12px 14px;border-radius:12px;font-size:13px;margin-top:14px}.hidden{display:none!important}@media(min-width:560px){.effects{grid-template-columns:repeat(5,minmax(0,1fr))}.effect{padding:12px 6px}}
+</style>
+</head>
+<body><main>
+<header class="head"><div class="logo">✦</div><div><div class="eyebrow">ESP32 • WS2812B</div><h1>Glow Controller</h1><p class="sub">Version 2.1 · Mobile Bluetooth LE</p></div></header>
+<section class="statusbar"><div><div class="status"><span id="dot" class="dot"></span><span id="statusText">Bluetooth disconnected</span></div><div id="deviceText" class="small">Connect to your Glow Controller nearby</div></div><button id="connectBtn" class="primary">Connect</button><button id="disconnectBtn" class="secondary hidden">Disconnect</button></section>
+<div id="unsupported" class="notice hidden">Web Bluetooth is not available in this browser. Open this page in Chrome on Android over HTTPS, or use your existing BLE app. iPhone Safari does not currently support Web Bluetooth.</div>
+<section class="card"><h2>Color</h2><div class="colorrow"><input id="colorPicker" class="colorinput" type="color" value="#ff3b70" aria-label="Choose LED color"><div class="hexbox"><label for="hexInput">HEX COLOR</label><input id="hexInput" maxlength="7" value="#FF3B70" spellcheck="false" autocomplete="off"></div></div><p class="small">Choose a color; it is sent to the LEDs when you finish selecting.</p><button id="sendColor" class="secondary" style="width:100%;margin-top:8px">Apply color</button></section>
+<section class="card"><div class="labelrow"><h2 style="margin:0">Brightness</h2><span id="brightnessValue" class="value">40%</span></div><input id="brightness" type="range" min="1" max="100" value="40" aria-label="Brightness"><div class="rangeends"><span>1%</span><span>100%</span></div><p class="small">Brightness is sent after you release the slider.</p></section>
+<section class="card"><h2>Effects</h2><div class="effects"><button class="effect active" data-effect="solid">● Solid</button><button class="effect" data-effect="rainbow">🌈 Rainbow</button><button class="effect" data-effect="chase">➜ Chase</button><button class="effect" data-effect="breathe">◉ Breathe</button><button class="effect off" data-effect="off">■ Off</button></div></section>
+<section class="card"><h2>Activity</h2><div id="log" class="log" role="status" aria-live="polite">Ready. Connect to start controlling your LEDs.</div><div class="small" style="margin-top:8px">Commands are sent directly to the ESP32 over BLE. Your existing Wi-Fi dashboard remains unchanged.</div></section>
+<div class="foot">Glow Controller V2.1 · Local BLE control</div>
+</main>
+<script>
+(() => {
+ 'use strict';
+ const SERVICE_UUID='7a1e0001-8f2b-4d3c-9a6e-1b2c3d4e5f60';
+ const COMMAND_UUID='7a1e0002-8f2b-4d3c-9a6e-1b2c3d4e5f60';
+ const STATUS_UUID='7a1e0003-8f2b-4d3c-9a6e-1b2c3d4e5f60';
+ const $=id=>document.getElementById(id);
+ let device=null,server=null,commandChar=null,statusChar=null,brightnessTimer=null,colorTimer=null;
+ const encoder=new TextEncoder();
+ function log(message){$('log').textContent=message;}
+ function setConnected(connected){$('dot').classList.toggle('on',connected);$('statusText').textContent=connected?'Bluetooth connected':'Bluetooth disconnected';$('deviceText').textContent=connected?(device?.name||'Glow Controller'):'Connect to your Glow Controller nearby';$('connectBtn').classList.toggle('hidden',connected);$('disconnectBtn').classList.toggle('hidden',!connected);}
+ function cleanHex(value){let v=value.trim().replace(/^#/,'');if(!/^[0-9a-fA-F]{6}$/.test(v))throw new Error('Enter a valid 6-digit HEX color, such as #FF0000.');return v.toUpperCase();}
+ async function send(command){if(!commandChar||!server?.connected){log('Not connected. Tap Connect first.');return;}try{await commandChar.writeValue(encoder.encode(command));log('Sent: '+command);}catch(e){log('Send failed: '+e.message);}}
+ async function connect(){
+  if(!('bluetooth' in navigator)){ $('unsupported').classList.remove('hidden');return; }
+  try{
+   $('connectBtn').disabled=true;$('connectBtn').textContent='Scanning…';
+   device=await navigator.bluetooth.requestDevice({filters:[{name:'Glow-Controller'}],optionalServices:[SERVICE_UUID]});
+   device.addEventListener('gattserverdisconnected',()=>{server=null;commandChar=null;statusChar=null;setConnected(false);log('Bluetooth disconnected.');});
+   server=await device.gatt.connect();
+   const service=await server.getPrimaryService(SERVICE_UUID);
+   commandChar=await service.getCharacteristic(COMMAND_UUID);
+   try{statusChar=await service.getCharacteristic(STATUS_UUID);if(statusChar.properties.notify){await statusChar.startNotifications();statusChar.addEventListener('characteristicvaluechanged',event=>{const value=new TextDecoder().decode(event.target.value);if(value.trim())log('ESP32 status: '+value);});}}catch(_){statusChar=null;}
+   setConnected(true);log('Connected to '+(device.name||'Glow Controller')+'.');
+   await send('STATUS');
+  }catch(e){if(e.name==='NotFoundError')log('No device selected. Try Connect again near your ESP32.');else log('Connection failed: '+e.message);}
+  finally{$('connectBtn').disabled=false;$('connectBtn').textContent='Connect';}
+ }
+ function disconnect(){if(device?.gatt?.connected)device.gatt.disconnect();else{server=null;commandChar=null;setConnected(false);}}
+ $('connectBtn').addEventListener('click',connect);$('disconnectBtn').addEventListener('click',disconnect);
+ $('colorPicker').addEventListener('input',()=>{$('hexInput').value=$('colorPicker').value.toUpperCase();clearTimeout(colorTimer);colorTimer=setTimeout(()=>applyColor(false),250);});
+ $('hexInput').addEventListener('change',()=>{try{const hex='#'+cleanHex($('hexInput').value);$('hexInput').value=hex;$('colorPicker').value=hex;applyColor(false);}catch(e){log(e.message);}});
+ $('sendColor').addEventListener('click',()=>applyColor(true));
+ async function applyColor(showMessage){try{const hex=cleanHex($('hexInput').value);$('hexInput').value='#'+hex;$('colorPicker').value='#'+hex;await send('COLOR='+hex);if(showMessage&&!commandChar)log('Color selected. Connect over BLE to apply it.');}catch(e){log(e.message);}}
+ $('brightness').addEventListener('input',()=>{$('brightnessValue').textContent=$('brightness').value+'%';clearTimeout(brightnessTimer);});
+ $('brightness').addEventListener('change',()=>{clearTimeout(brightnessTimer);send('BRIGHTNESS='+$('brightness').value);});
+ document.querySelectorAll('[data-effect]').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('[data-effect]').forEach(b=>b.classList.toggle('active',b===button));send('EFFECT='+button.dataset.effect);}));
+ if(!('bluetooth' in navigator))$('unsupported').classList.remove('hidden');
+})();
+</script></body></html>
